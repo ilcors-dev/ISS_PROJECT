@@ -25,8 +25,47 @@ Cosa riceve l'inceneritore per attivarsi e bruciare la spazzatura? E chi gli man
   Esempio: all'inizio, il robot prende la spazzatura e la porta nell'inceneritore, quindi il Led dovrebbe essere acceso perchè l'inceneritore sta bruciando, ma nello stesso momento il container della
   cenere è vuoto, quindi il Led dovrebbe lampeggiare.
 
+SOSTANTIVI/ENTITA':
+  - WIS
+  - OpRobot
+  - Incinerator
+  - Service Area
+  - Waste Storage Container
+  - Roll Packets
+  - Ash Storage Container
+  - Monitoring Device
+  - Sonar
+  - Led
+  - BURNIN port
+  - BURNOUT port
+  - WASTEIN port
+  - ASHOUT port
+  - HOME location
+  - Scale (weighing device)
+  - External Agent WasteStorage ?????
+  - External Agent AshStorage ?????
 
+VERBI/AZIONI:
+  - Perceive (Incinerator)
+  - Burning (Incinerator)
+  - Emits (Incinerator)
+  - Move to the WASTEIN port (OpRobot)
+  - Get a RP (OpRobot)
+  - Move to the BURNIN port (OpRobot)
+  - Deposit (OpRobot: Incinerator)
+  - Move to the HOME location (OpRobot)
+  - Move to the BURNOUT port (OpRobot)
+  - Extract (OpRobot: Incinerator)
+  - Move to the ASHOUT port (OpRobot)
+  - Deposit (OpRobot: AshStorage)
+  - Reports (Scale)
+  - Acquire (WIS)
+  - Measures (Sonar)
+  - IsConsideredFull (AshStorage)
+  - IsOn (Led)
+  - IsOff (Led)
+  - Blinks (Led)
+  - IsEmpty (AshStorage)
 
-  
-  
-  
+  - PutInto (External Agent WasteStorage) ?????
+  - Remove (External Agent AshStorage) ?????
