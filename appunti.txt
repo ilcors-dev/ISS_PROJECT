@@ -1,0 +1,327 @@
+il pojo è MORTO e c'è bisogno del main thread che lo risveglia "iniettandogli" un thread
+
+l'attore invece è vivo e riceve messaggi che elabora in modo FIFO, un buffer praticamente
+
+l'attore FSM (Finite State Machine) invece prende il messaggio che gli interessa in quel momento, in base allo stato in cui si trova in quel momento
+
+sono intrinsecamente osservabili e saranno osservati da qualcuno che può essere nello stesso pc o in contesti diversi, a noi non interessa
+
+i messaggi sono fondamentali per creare un sistema
+
+21/03/2024
+piano di testing = produttore deve inviare una richiesta con distance(20) e il consumatore deve rispondere con ack(20).
+Ora bisogna formalizzare questo in JUnit.
+
+Simulare gioco del ping pong, in cui ci sono gli attori ping e pong, devono interagire, analizziamo problema e diamo modello come lista requisiti e problemi.
+La differenza con quanto visto è che non può partire ping senza che sia partito anche il pong. Dobbiamo discutere se la pallina è modellabile attraverso dispatch, request oppure
+response (?)
+
+
+Per creare un nuovo progetto, seguire Primipassioperativi24.html e QakActorsIntro24.html se usiamo gli actor
+
+
+26/03/2024
+Negli scram ci sono gli sprint, il prodotto viene fatto in più passaggi e in ogni sprint aggiungiamo sottoinsiemi di requisiti (funzionante). 
+Sprint 0 = analisi requisiti
+Sprint 1 = ?
+Il modello non è un programma perchè vuole catturare gli aspetti che io ritengo essenziale. È una rappresentazione che cattura ciò che io ritengo essenziale. 
+Da requisiti, in PingPong, dire che i due player (attori) interagiscono attraverso messaggi è troppo vago. Dovremmo dire se è una dispatch (end to end, fire and forget),
+request (si aspetta una reply, point to point) oppure event (non si sa quando verrà ricevuto).
+Quello che dico nel modello è interpretabile dalla macchina, attraverso un pezzo di codice mi viene creata una figura (PingPongSystem24.html) in cui ci sono i due attori, 
+ma non ho detto come le due entità scambiano informazione.
+Il sistema deve terminare.
+L'analisi del problema fa l'analisi, non dobbiamo dire come deve essere risolto, quello è compito del progettista.
+Gli analisti devono litigare prima di passare al progetto.
+
+04/04/2024
+PingPong con Referee:
+	Ping e Pong si scambiano info con dispatch, quindi si conoscono. Il referee potrebbe utilizzare gli eventi, è consapevole dell'esistenza del sistema e quando esiste
+	sa che esistono anche Ping e Pong (ciascun nodo ha la stessa conoscenza del sistema) e quindi mando un evento (fischio partita), 
+	anche se non conosco chi sono Ping e Pong, saranno loro a sapere il comportamento conseguente. Per i falli possiamo utilizzare l'Observer (conosce solo l'esistenza di chi 
+	viene osservato). EmitEvent viene propagato a tutti i componenti del sistema (tranne a chi lo invia), updateResource è punto a punto. Se volessimo inserire un logger,
+	possiamo aggiungere un Observer che osserva tutti, che per essere osservati devono fare una updateResource.
+	In locale, sulla stessa JVM, 3 progetti diversi: Ping24, Pong24, PingPong24referee
+	
+WolfDetection:
+	Quanti nodi? Come interagiscono queste entità? Se possiamo dirlo lo diciamo nei requisiti, se no nell'analisi. Mi interessa modellare l'interazione tra i vari componenti.
+	
+	
+08/04/2024
+Raspberry possiamo mandargli un'email per vedere se ce lo presta, altri accessori come sonar e i cavi femmina-femmina che sono difficili da trovare.
+Comanda l'applicazione, non l'interfaccia. Nelle aziende spesso si sviluppa prima l'interfaccia, ma è sbagliato!
+Architettura Esagonale:
+	Applicazione deve essere indipendente da ingressi e uscite, è il dispositivo che si deve adattare alle esigenze dell'applicazione, non viceversa.
+	Display o è Pojo o è Actor, 90% è un Pojo e quindi mi darà un'interfaccia con Write, Print, Show etc... e sarà morto, sono io che gli darò il controllo.
+	Come analisti dovremmo quindi discutere se stiamo parlando di Pojo o Actor. System.out è un Pojo (stiamo chiamando il println)
+	Se è un Pojo ci dà interfaccia, se è un Actor invece dobbiamo sapere solo come parlarci, dobbiamo sapere che tipo di interazione dobbiamo avere con esso.
+	Con un display di tipo Actor dobbiamo sapere se usare request, dispatch o event. 90% inviamo un dispatch.
+	Chi ha sviluppato il software definisce l'interfaccia.
+	L'analogo di un attore dice "se mi vuoi usare devi mandarmi un dispatch con un certo payload".
+	L'applicazione si deve adattare al dispositivo, l'inversione delle dipendenze significa che chi detta l'interfaccia è l'applicazione. Per questo motivo diciamo che 
+	l'architettura esagonale (Port-Adapter) rende inconsapevole l'applicazione della natura dei dispositivi.
+
+Quando leggiamo l'analisi dei requisiti, coloriamo in blu i sostantivi, cioè quelli che saranno mappati in qualche entità. Il verbo, colorato di rosso, sarà l'interazione
+tra le entità. Dopo aver delineato le entità, dobbiamo discutere se sono Pojo o Actor, se sono Pojo dobbiamo dire in quale pancia saranno (la mia architettura è ad attori).
+Come faccio a far interagire con un servizio? Devo stabilire una connessione TCP con il tuo pc, quindi devo sapere l'indirizzo su cui sta girando. Una volta stabilita la connessione
+invio attraverso essa una request (materialmente invia la stringa: 'msg(MSGID, MSGTYPE, SENDER, RECEIVER, CONTENT, SEQNUM)')
+
+11/04/2024
+
+16/04/2024
+Le entità in ? sono 3 threads, quindi 3 entità indipendenti che condividono il filesystem (standard input e standard output)
+Publish Subscribe
+Adesso il Led++ non è più un Pojo ma un Client, lo chiameremo LedActor, è capace di ricevere messaggi ma anche accendere il led, quel software python scritto in precedenza
+diventa parte di un actor.
+
+18/04/2024
+Per accendere un led in remoto abbiamo bisogno di far partire il comando da un altro dispositivo, quindi stabilire una connessione e una tecnologia di invio e ricezione di
+messaggi, utilizzare protocolli per la comunicazione (TCP, UDP, CoAP, HTTP, etc..). Dobbiamo fare sul Raspberry un server TCP (esempio) e sul pc un client. Il server TCP deve 
+convertire un messaggio arrivato in qualcosa collegato all'accensione del led. Se non cambia nulla in base al protocollo utilizzato, allora vuol dire che abbiamo creato 
+l'architettura logica.
+Il Raspberry è un Actor perchè è capace di ricevere messaggi ed elabolarli per fare qualcosa. Il codice Python è un Pojo e va a finire nella pancia dell'Actor. Il server
+TCP è nella parte sommersa dell'Actor. L'Actor può ricevere messaggi come CoAP o MQTT, è intrinsecamente capace.
+L'architettura logica del mio sistema (per accendere il led in remoto) è costituita da 2 componenti che modellerò come Actor.
+Qak abbatte i costi. Il primo modello da fare è in locale, sempre meglio. Dobbiamo definire i messaggi che il client manda al server e poi il contesto.
+Scrivere stato iniziale in modo da far capire che diventerà un ASF.
+
+Creare attori, poi con le transizioni fare in modo che all'arrivo del messaggio venga runnato il codice python che attiva il led. Il codice Python va messo nella dir bin del progetto
+
+Abbiamo creato progetto Qak, che in locale si scambiano messaggi per accende e spegnere led, gli attori richiamano i file Python che accendono/spengono il led.
+Ogni actor ha stati di cui definiamo uno lo stato iniziale.
+Transition si riferisce allo stato che ha sopra, quindi quando è nello stato X si aspetta le transizioni dichiarate successivamente.
+
+30/04/2024
+Per far partire docker, aprire prima l'app
+Nell'IoT l'interazione è più complicata, non è client-server. Prima di passare alla realtà, può essere utile creare dei mondi virtuali.
+BoundaryWalk:
+	Abbiamo bisogno di una stanza: dobbiamo dire cos'è, ad esempio uno spazio piano euclideo modellata come un rettangolo.
+	Il robot è iscrivibile in un cerchio di diametro 2r (era scritto nelle specifiche).
+	Nella stanza ci sono dei sonar che rilevano la distanza dal robot ed è posto sul bordo, quando rilevano il robot emettono dei json.
+	cril = concrete robot interation language
+	abbiamo bisogno di un test che verifica se il robot ha percorso tutti i bordi. Deve partire da home e tornare a home percorrendo il perimetro
+	in che unità di misura esprimo la lunghezza? in dl, cioè la dimensione del robot.
+	fase proattiva = quella autonoma, cioè il sistema parte ed ha un obiettivo, fa qualcosa
+	fase reattiva = quella di reazione a qualcosa, di percezione.
+	↑ sono funzionamenti che un sistema software può presentare.
+	il messaggio di stato viene emesso quando il robot si muove, quando compie un'azione.
+	quando il robot passa vicino il sonar, vengono mandati più messaggi, in modo ripetuto.
+	l'analista non elenca le soluzioni, ma dice quali problematiche sono presenti.
+	Problematiche:	come reagisce il core agli eventi mentre sta eseguendo il funzionamento proattivo?
+					come fa il core a mandare i messaggi al robot? posso farlo sia in modo sincrono che asincrono
+					come avviene la percezione delle info emesse dal sonar
+	successivamente l'analista guarda le tecnologie per vedere se c'è qualcosa che può aiutarlo oppure no
+	VirtualRobot non è un POJO perchè è un'entità proattiva e ci interagisco scambiando messaggi nella stessa lingua. Finchè un pojo le dipendenze sono i metodi dell'interfaccia
+	del pojo, qui in realtà conosco il cril e comunicherò attraverso quello. ci sono dipendenze sul linguaggio di comunicazione. dovrei adeguarmi al linguaggio del robot.
+	se invertiamo la dipendenza, allora abbiamo bisogno di un interprete, di un traduttore, che traduca la mia lingua in quella del destinatario e il linguaggio che uso io
+	deve avere una capacità espressiva al pari di quella del robot. inoltre il linguaggio del robot sarà diverso da quello del virtualRobot che sarà aril = abstract robot interation
+	language.
+	
+02/05/2024
+In bw24proto1all:
+	Con Goto si perdono i messaggi rimasti in coda (se ne sbatte), mentre con le transizioni (es. Transition t0) non succede e i messaggi rimasti possono essere 
+	gestiti successivamente
+	Stiamo lavorando su una connessione websocket in cui facciamo interazioni asincrone, quindi non rimango in attesa della risposta ma faccio polling (cioè controllo 
+	se mi ha risposto) oppure rendo la connessione osservabile (cioè ci metto un Observer sulla connessione e spero se ne accorga)
+	L'update dell'Observer (il Pojo fa anche da Observer grazie a "extends ApplAbstractObserver") verrà chiamato dal supporto della websocket.
+	Il pojo sa che al livello superiore c'è un attore, quindi sa che per comunicare deve mettere il messaggio in coda. 
+	In questo modo una parte sommersa comunica con una emersa.
+	
+	Se non lo facciamo con mqtt non partirà finchè non esistono i due contesti, se invece facciamo con mqtt possiamo lanciare in maniera indipendente (per noi risulterà più 
+	user friendly, meno tricky, usare mqtt).
+	Per casa, sostituire il sonar24mock con quello che abbiamo sul raspberry.
+	
+07/05/2024
+Nello userdoc ci deve essere il riferimento al modello. Ricopiare i requisiti e poi fare analisi dei requisiti e analisi del problema, cioè quali problemi nascono da quei requisiti
+e non bisogna dire come risolverli, non è nostro compito.
+Mappa della stanza = una rappresentazione della stanza, non è la stanza.
+Nell'architettura logica ho messo un robot che è responsabile di far muovere il robot virtuale. Se un giorno voglio aggiungere un altro per il robot fisico, non me ne accorgerò
+a livello applicativo. Quindi il robot farà da interprete e mapperà nel linguaggio del tondino che stiamo usando.
+Punto chiave inversione delle dipendenze = chi è che definisce la struttura dell'interfaccia.
+Base di conoscenza = stringa Prolog
+aggiungere attore che spara allarme e quando lo fa il cleaner si deve fermare
+
+In it.unibo.virtualRobot2023, aprire cmd ed eseguire "docker run -ti -p 8090:8090 -p 8091:8091 --rm  docker.io/natbodocker/virtualrobotdisi23:1.0" per far partire emulatore
+
+09/05/2024
+Prima di far diventare un sistema proattivo, bisogna renderlo reattivo.
+Bisogna rendere sensibile la mia entità all'evento che l'altro attore genera. Per farlo, utilizziamo le transizioni degli attori.
+Usiamo un dispatch come interrupt perchè l'evento potrebbe perdersi.
+Gli attore computazionalmente occupano poca memoria, perciò creiamo un attore sentinella che percepisce l'evento allarme e trasforma l'evento in una forward al cleaner. Perciò sarà
+un dispatch e useremo whenInterrupt (al posto di whenEvent).
+Lo step è un'azione atomica, quindi non si può fermare in quel momento ma solo alla fine.
+Vogliamo introdurre dei supporti che ci aiutino a scrivere le mosse del robot e in automatico la redefinizione della mappa per ogni passo effettuato.
+
+14/05/2024
+TemaFinale23:
+Formalizzare i requisiti = scrivere qualcosa che è interpretabile dalla macchina, non dobbiamo scrivere frasi in italiano!
+Dobbiamo leggere attentamente le frasi e cercare di dare un'interpretazione condivisa con il committente e deve tradurla in qualcosa che sarà interpretato dalla macchina.
+Service area = il luogo in cui agisce la nostra macchina, avrà una lunghezza pari a n dr, cioè n volte la lunghezza del robot
+indoor port = un punto della service area che andrà da una coordinata x1 a una coordinata x2 nella service area.
+abbiamo fatto un modello (non un programma) della service area e per farlo ci appelliamo alla matematica. il modello della stanza è un sistema di coordinate che va da (0,0) a (lu,0)
+a (lu,lf) a (0,lf) dove lu = n*rd (riconduciamo tutto al robot, utilizziamo quindi le unità robotiche)
+coldRoom = punto fisso della service area rappresentato dalle coordinate dei vertici, zona della service area non percorribile dal robot, dobbiamo anche dire la zona accessibile, 
+			da cui caricare la roba.
+il container ha una capacità massima MAXW 
+a DDR robot... = differencial drive robot, ma alla macchina dobbiamo dare del codice, "per ddr robot intendiamo questo codice", dove il codice è quello del virtualRobot, alla
+					macchina diamo un POJO (la macchina imparerà i metodi del POJO) o un servizio (avrà i messaggi). Optiamo per servizio col quale parlerò in un certo modo e che
+					ha nella sua pancia il dettaglio di quale robot fisico o virtuale userà. Lo chiameremo BasicRobot. Poi alla macchina diremo se la comunicazione avviene attraverso
+					metodi sincroni o asincroni.
+... working as a transport trolley = cos'è un transport trolley? come si comporta? Sono tutte cose implicite nel testo. è l'entità che rappresenta la logica applicativa. è quella 
+										cosa che fa le cose che dovrà fare. il transport trolley può avere una macromossa che dice di andare alla indoor port e che il ddr robot
+										non sa cos'è etc.. il transport trolley non è un IS A del ddr robot, ma il robot USA il transport trolley.
+										il robot non conosce le mappe, le mappe sono conosciute dal transport trolley.
+Dobbiamo capire come costruire una mappa a ostacoli, come costruire un pianificatore che data la mappa è capace di darmi un piano di come spostarmi e come costruire un basicrobot.
+							
+21/05/2024
+BasicRobot = qualunque dispositivo software che potrò utilizzare in modo indipendente dalla tecnologia con cui verrà realizzato. Dal punto di vista della macchina, è un qak.
+BasicRobot esegui i comandi, engager perchè prima di utilizzarlo bisogna "impossessarsene", planexec esegue piani di movimento (gli mando una sequenza di movimenti e se fallisce
+mi dice quali movimenti non è riuscito a fare), robotpos realizza il posizionamento del robot in una cella data della mappa. Queste funzionalità nel robot virtuale non ci sono,
+sto portando queste cose in un livello più alto aumentando le sue funzionalità
+Probabili domande finali = nel sistema BasicRobot ci sono dei server (in generale)? Docker è stato usato solo per attivare il virtualRobot, d'ora in avanti verrà nascosto, noi
+							communicheremo solo con il robot fisico, quindi risposta sbagliata. Sul robot fisico monto una telecamera e se la pagina html diventa di accesso
+							per la telecamera, vedremo l'immagine che cambia e anche il robot che si muove, possiamo comandare il robot da remoto, quindi c'è un server.
+							Se faccio partire un qualunque sistema qak, parte un server TCP e un server CoAP, non parte un server Web (attualmente), quindi la pagina html non
+							non dovrebbe esistere perchè non puoi runnare un pagina html fuori da un server Web in grado di fare quello che dovrebbe fare.
+							Non ci sono Web server, una pagina html comunica con un web server con http o web socket. è possibile farlo comunicare con MQTT? No. 
+<iframe> per aprire una pagina html dentro una pagina html
+Tema finale 2023 = una GUI di comando del robot (il camionista dice quanto vuole scaricare) e una seconda GUI per vedere lo stato interno vista solo dall'amministratore, 
+					relazione tra GUI e applicazione. Rispolverare CleanArchitecture, la GUI deve interagire come vuole l'app, non l'app che si adegua alla GUI.
+Seguire istruzioni per Spring.
+
+23/05/2024
+
+28/05/2024
+Programma è quello che scrivo che mi permette di parlare con una certa tecnologia, Modello è una via di mezzo per parlare sia con le macchine che con gli umani. Dobbiamo quindi
+impostare un processo di sviluppo software in cui in ogni fase io possa parlare a costi ridotti sia con le macchine che con gli umani. Con uno solo non va bene!
+Il senso dell'esame finale è quello di fare l'analisi dei requisiti per produrre un modello (per interagire sia con la macchina che con l'utente), dopo facciamo l'analisi del
+problema (che esiste solo se capisco bene i requisiti), non bisogna poi costruire la soluzione al prolema, ma capire l'insieme dei concetti da affrontare e investire risorse
+per costruire un metamodello che sia più vicino al concetto, non devo costruire subito il codice ma il mondo del dominio applicativo (tipo dei robor per automatizzare alcuni
+processi, è un dominio applicativo diverso da cloud computing e altro perchè i robot sono fisici).
+Leggere requisiti TemaFinale23 e produrre un modello.
+Il modello dei requisiti è quello che rappresenta il succo estraibile dal testo dei requisiti.
+Una volta mandato il modello dei requisiti, confronto i vari modelli dei requisiti e se sono molte discrepanze, non possiamo andare avanti perchè significa che alcune persone hanno
+capito cose diverse. Poi entriamo in un'operazione chiamata "categorizzazione dei requisiti", cioè quali requisiti devono essere affrontati per primi e quali no. L'analisi dei
+requisiti finisce con un modello e con una lista delle priorità. Lo Sprint1 finisce con un sistema software che non fa tutto quello che viene richiesto, ma solo un sottoinsieme,
+poi lo mostreremo al committente. Lo Sprint1 lo metto in un progetto e poi posso passare allo Sprint2. Dobbiamo organizzare il processo di produzione per bene per non avere
+problemi quando il committente vuole aggiungere nuove cose. Modello a Cipolla integrata, cominciamo con un core e poi iniziamo a fare vari strati (Sprint). Io come informatico
+magistrale sono un costruttore di applicazioni ma anche un costruttore di un qualcosa che mi permette di abbattere i costi di produzione, sono una factory.
+Quando il committente ci chiede di usare il ddr, facciamo un link al VirtualRobot.
+Inversione delle dipendenze consiste nel fatto che sono i supporti che si devono adeguare alle interfacce che il BasicRobot vuole, è compito di chi crea le interfacce che si deve
+adeguare al basicrobot. Quindi non il basicrobot che in base alle interfacce dei supporti si adatta.
+Il primo disegno in BasicRobot24 ci dice che il basicrobot può usare virtual, realmbot o realnano.
+Per specializzare un attore, dobbiamo usare la cipolla, cioè l'attore basicrobot avrà intorno un altro attore che userà il basicrobot.
+
+Fare un programma (Boundary) che usa il basicrobot per far fare il giro della stanza (perimetro) e mentre fa il giro della stanza calcoliamo il perimetro.
+Il robot si deve fermare quando passa vicino al sonar.
+
+Se usi ExternalQActor, al contesto locale gli dai localhost, all'esterno 127.0.0.1
+
+30/05/2024
+Il sonar che fa fermare il robot sarà un sonar esterno, non sul robot.
+Per creare l'interfaccia Facade dobbiamo servirci di tecnologie quali Spring o Node, non possiamo scrivere la web application con il linguaggio qak. 
+Io nel linguaggio definisco solo con un comando che utilizza un jar e determinate librerie. Dobbiamo aggiornare il file build.gradle per dire alla nostra applicazione
+di usare la facade.
+La clean architecture consiste in qualcosa che ha al centro il core business, cioè il dominio e l'entità che lo rappresentano, che vengono costruite con intorno i casi d'uso. 
+Dato lo stesso dominio, intorno ci posso mettere un numero illimitato di applicazioni.
+Qualunque applicazione è fatta da una sostanza e da cose "ciapinose". Al centro dei pensieri del progettista c'è il dominio applicativo, in cui rientrano classi e oggetti. 
+GUI e interfacce non rientrano nel dominio, fanno parte delle cose "ciapinose". Adesso invece nel dominio applicativo rientrano servizi e microservizi, cioè adottano il principio
+di singola responsabilità, ogni servizio si occupa solo della sua cosa.
+Al centro di un'applicazione Spring c'è il controller. Se scrivo nel controller dei pezzi di logica applicativa, avremmo un grandissimo problema, è un rischio mortale perchè
+iniziamo a mettere nel controller codice per gestire qualunque cosa e non va bene.
+Nel basicrobot non vogliamo scrivere nessuna linea di codice riguardo la logica applicativa dell'interfaccia GUI.
+Nell'applicazione finale, quando ci verrà chiesta una GUI, possiamo usare Facade24Start per prendere spunto.
+La responsabilità della mia business logic l'ho data a ApplGuiCore e avrà la responsabilità di interagire con l'actor,  WebSocketHandler invece gestirà le websocket messe nella
+pagina, l'informazione anche qui fruisce in due sensi, all'app web e alla logica.
+Per parlare con il servizio, la responsabilità viene delegata a non ho capito chi.
+Il core dice di cosa ha bisogno per comunicare, quindi sarà l'adapter che verrà costruito secondo le richieste del core.
+
+04/06/2024
+Se lavoro con un basicrobot, lavoro con un meccanismo in grado di percepire l'ambiente.
+Il core business del basicrobot si occupa di fare il giro, l'Observer è stato disaccoppiato e guarderà agli eventi emessi dal sonar. Se l'Observer, guardando il payload, vede che
+è un evento del sonar, farà una forward al core business per dirgli di fermarsi.
+docker run -it --rm --name basicrobot24 -p8020:8020/tcp -p8020:8020/udp --privileged basicrobot24:1.0
+↑ fa un mapping tra le porte del pc e quella della macchina virtuale
+Quello del FlipFlop è un sistema, che differenza c'è tra 2 NOR e il sistema?  L'essenza del sistema è nel modo in cui io unisco i due NOR.
+L'essenza dell'informatica è che se io prendo ?
+TemaFinale24: c'è un robot che deve spostare delle robe in un inceneritore. La parte strutturale è fatta con una stanza con due aree esterne. In una metto la spazzatura ed è
+				riempita da un agente esterno, un'altra in cui raccolgo le ceneri dell'inceneritore. Questo ha una porta BurnIN in cui metto i pallet e 
+				una porta BurnOUT in cui prelevo la cenere.
+				Quindi il robot quando si accorgerà che la stanza della spazzatura ha qualcosa dentro, la prende e la porta nella porta BurnIN se l'inceneritore è vuoto, quando
+				finisce di bruciare emetterà un suono, verrà percepito da qualcuno che dirà al robot di andare a prendere la cenere. Ma può farlo solo se la stanza delle ceneri
+				non è completamente piena. Il sonar che abbiamo fatto simula la cenere che è aumentata di livello.
+
+06/06/2024
+Noi all'inizio del corso avevamo un imprinting sugli oggetti, qualunque cosa l'avremmo ricondotta ad un oggetto.
+Il progettista software è consapevole delle tecnologie e degli strumenti di produzione, ma al centro della mia attenzione come ingegnere c'è il problema da affrontare
+nell'ambito di un certo dominio applicativo. Che è il brodo in cui inserirò il mio software. Al centro della mia attenzione non c'è il rapporto con le macchine ma con il dominio
+applicativo. Posso sfruttare la metodologia agile per la creazione del software. L'idea è quella di avere un software che evolve, facciamo dei prodotti che evolvono sotto la spinta
+di nuovi requisiti e necessità. Per farlo lavoriamo in team che devono organizzarsi, non c'è un project leader, il progetto viene fuori da uno sforzo collaborativo.
+Devono essere scambiate informazioni chiare per farlo. Un team produce e mantiene un software finchè non viene tolto dal mercato. 
+Dobbiamo sfruttare a pieno la modellazione del software. La differenza tra un modello e un progetto è
+La prima cosa da fare per l'approccio AGILE (secondo SCRUM Guide) rigiarda il what e l'how che rientrano nello Sprint Backlog.
+Poi si fa Daily Scrum, cioè il team si riunisce all'inizio della giornata lavorativa e discute quello fatto ieri e quello da fare oggi (na roba di 15 minuti eh).
+Poi si lavora.
+Successivamente Sprint Review: il momento in cui il team si chiede se è stato raggiunto l'obiettivo.
+Poi Sprint Retrospective: cioè il team si chiede se lo sprint è stato fatto bene, se è stato fatto uno userDoc?
+Due cose fondamentali, Prodotto e Processo. La Sprint Review si occupa del prodotto. La Sprint Retrospective si occupa del processo.
+Organizzarsi bene vuol dire arrivare prima sul mercato, essere competitivi, reagire a determinati problemi etc...
+Differenza tra programma e modello: devono essere comprensibili entrambi dalla macchina, prima cosa vedere quanto è lungo, la principale differenza è che il modello mette
+in risalto solo alcune cose, il modello è la rappresentazione dell'essenza di un sistema. Il modello cattura aspetti essenziali del sistema collocandosi in un preciso spazio 
+concettuale. Un modello veicola com'è organizzato. 3 dimensioni dei miei concetti: struttura, comportamento e interazione. Quando parlo di modello, parlo di queste 3 cose.
+Nell'UML, le classi esprimono la struttura, il diagramma degli stati esprime il comportamento, le interazioni sono espresse dal modello degli stati.
+Un modello comincia a nascere nella nostra testa, se voglio comunicare quello che ho nella mia testa devo utilizzare un linguaggio. Devo avere chiaro il concetto
+di concetto e di rappresentazione. Per l'ing del software un modello è una visione semplificata di un sistema che rende il sistema più accessibile. 
+file:///C:/Users/sinda/Desktop/University/Magistrale/IngegneriaSistemiSoftware/issLab24/iss24Material/docs/_static/QakAndProcess.html M1 è descritto da UML, M2 è il modello
+che definisce l'insieme delle cose che possiamo scrivere quando facciamo un modello. Il metamodello di Java è Java stesso. Cioè lo spazio concettuale di Java.
+UML2 prova a definire in maniera normale come definire alcune cose in UML. Attraverso un meta metamodello (M3). In M3 c'è lo spazio concettuale che permette di esprimere
+un qualunque metamodello. Usando MOF (Meta-Object Facility) possiamo definire nuovi metamodelli. Partendo da MOF definisco un metamodello che chiamo QAK che utilizzo per
+esprimere dei modelli nel linguaggo QAK.
+In UML ci sono classi, istanze etc.. che sono tutte espresse attraverso classi e combinazioni di esse. 
+è stato utillizato Eclipse Eclipse Modeling Framework (EMF) per definire il mio linguaggio e il mio metamodello, con dei tools come Xtext. Quando mettiamo i plugin in Eclipse,
+lo stiamo dotando del know-how per implementarlo. Il plugin che installiamo prende in ingresso un High level Application Code, cioè un modello, che è un instance of qak metamodel
+che attraverso una factory genera Kotlin code che colma il gap che c'è tra i miei concetti e la tecnologia sottostante.
+Kotlin perchè ha coroutines che possono essere runnati da un thread o da più thread.
+
+Alla fine dello Sprint0, dobbiamo consegnare modello requisiti, piani di testing funzionale, ripartizione dei requisiti in classi di importanza/priorità, stima dei tempi di 
+sviluppo/produzione. Tutto in maniera comprensibile sia dal prof che dalla macchina.
+Avendo un foglio bianco, lo dividiamo in 3 paragrafi: Analisi dei Requisiti (per capire cosa ha detto il committente), come analista analizzo i requisiti in termini di struttura,
+in termini di interazione e in termini di comportamento. 
+Per quanto riguarda la struttura, ci sono delle entità.
+I requisiti ci impongono l'uso dei POJO o degli Actor?
+Elenco entità:
+	- Software System Service (WIS)
+	- OpRobot
+	- Incinerator, deve ricevere ed emettere informazioni attraverso messaggi
+	- Service Area
+	- Waste Storage
+	- Ash Storage
+	- Monitoring Device
+	- WasteIN port
+	- WasteOUT port
+	- Roll Packets
+	- BurnIN
+	- BurnOUT
+	- AshOUT
+	- Home
+
+Messaggi:
+	- Attivare inceneritore
+	- SonarInfo
+	- ScaleInfo (per la bilancia della cenere)
+	- Fischio dell'inceneritore che verrà percepito dal WIS
+	
+Mi chiedo se sono Dispatch, Event o Request.
+All'inceneritore non sappiamo se arriverà un evento, una request o un dispatch. I requisiti non lo specificano.
+
+Responsabilità:
+	- L'inceneritore inizierà a bruciare quando avrà qualcosa nella porta di input e finirà dopo tot tempo.
+
+I requisiti ci dicono quale sarà il comportamento dell'inceneritore.
+Il prototipo generato non sarà perfettamente funzionante perchè mancano delle informazioni. Possiamo fare delle ipotesi sul funzionamento (specificando che non è un requisito)
+in modo da far funzionare il tutto e mostrarlo al committente.
+Il core business del sistema è incenerire i rifiuti. Quindi devo mettere in campo qualcosa che lo faccio. Il resto delle cose lo faccio attraverso i mock che verranno colmate
+successivamente.
+Il WIS deve consultare la bilancia (ScaleInfo) prima di avvisare il robot di andare a prendere la cenere.
+Dobbiamo decidere se è l'OpRobot ad ascoltare i dati della bilancia o il WIS. Di chi è la responsabilità? Secondo il prof, la responsabilità va data al WIS e lasciare pochissima
+responsabilità all'OpRobot.
+Come committente, il prof vorrebbe vedere qualcosa alla fine dello Sprint0.
