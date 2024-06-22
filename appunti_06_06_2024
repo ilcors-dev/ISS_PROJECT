@@ -1,0 +1,39 @@
+ISS appunti 06/06/2024
+
+Analisi tema finale, alla fine dello sprint0 il prof si aspetta:
+- La definizione di un possibile modello dei requisiti
+- La definizione di rilevanti piani di testing funzionale
+- Ripartizione dei requisiti in classi di importanza / priorità
+- Stima dei tempi di sviluppo / produzione
+Sia comprensibile al prof, che alla macchina (modelli qak)
+
+Come analista analizzo i requisiti in termini di struttura, interazione e comportamento modellandoli in .qak. Possono essere messi come paragrafi sul documento.
+
+Voglio arrivare ad un modello dei requisiti. Se riesco a fare questo modello e ho abbastanza informazioni, posso mostrare al committente un prototipo funzionale. Tempo stimato per i requisiti (4/8h, ma in una giornata).
+
+Nel testo del committente sono già presenti le seguenti entità:
+- WIS -> software system service
+- Incinerator
+- Service Area
+- WasteStorage
+- AshStorage
+- RollPackets
+- MonitoringDevice
+- Home
+- BURNIN PORT
+- BURNOUT PORT
+
+Messaggi:
+- Comando per attivare l’inceneritore (Activation Command)
+- ScaleInfo
+- SonarInfo
+ Analisi delle entità:
+- L’inceneritore è un’entità che deve emettere e ricevere messaggi
+
+I messaggi scambiati sono request, dispatch o events? Ad esempio il fischio dell’inceneritore è un evento, dato che deve essere sentito da tutti.
+
+Se c’è qualche informazione non chiara, da chiarire con il committente allora non sarà inserito nel primo modello QAK.  L’inceneritore incomincia ad incenerire non quando parte, ma quando c’è qualcosa sulla porta BURNIN.  Siamo in grado di eseguire un primo modello dell’inceneritore con queste informazioni. Sì, abbiamo tutte le informazioni. Procedo a scrivere un attore QAK ‘inceneritore’ e strutturo e un modello di interazione mock.
+
+Quando l’inceneritore ha finito di bruciare, chi scarica la cenere? È un punto poco chiaro, da chiedere al committente probabilmente. È più un dettaglio dettato dall’inceneritore stesso che dal committente, in base a che modello ha e come funziona. Magari esiste un inceneritore che può essere ricaricato senza essere svuotato mentre un’altro richiede la rimozione della cenere per poter inserire un nuovo carico.
+
+Chiaramente con queste informazioni mancanti, il modello sarà parzialmente funzionante. Ogni modello / prototipo può avere al suo interno delle assunzioni per far funzionare il prototipo.
