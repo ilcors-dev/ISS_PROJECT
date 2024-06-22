@@ -1,0 +1,32 @@
+ANALISI DEI REQUISITI:
+
+L'inceneritore può inviare e ricevere messaggi.
+Da requisito, le informazioni emesse dall'inceneritore sono un evento. 
+Cosa riceve l'inceneritore per attivarsi e bruciare la spazzatura? E chi gli manda il messaggio?
+
+  COMPORTAMENTO INCENERITORE:
+  L'inceneritore si attiva attraverso un comando wireless, processa un RP in BTIME secondi e alla fine emette un fischio (evento) percepito dall'OpRobot e dal WIS.
+
+  COMPORTAMENTO OPROBOT:
+  è chiaro
+
+  MANAGEMENT DEI CONTAINER:
+  Ci sono 2 devices che comunicano con il WIS, uno è una bilancia (Scale) nel magazzino della spazzatura e l'altro è un Sonar nel magazzino della cenere.
+  Ci sono 2 agenti esterni, uno che inserisce la spazzatura nel magazzino della spazzatura e un altro che si occupa di rimuovere la cenere dal magazzino della cenere.
+  Se il valore di Scale è circa uguale a 0, allora vuol dire che non c'è spazzatura.
+  Il Sonar si occupa di segnalare il livello di cenere nel magazzino. I requisiti riportano che nel magazzino può entrarci la cenere prodotta da 3-4 RP.
+  Cosa significa PIENO? Quanta cenere produce un pacchetto? Per capire di quanto aumenta il livello della cenere quando il robot la deposita
+
+  GUI:
+  è chiaro
+
+  COMPORTAMENTO MONITORING DEVICE:
+  c'è un Led, ci devono essere delle priorità? E se sì, in quale modo?
+  Esempio: all'inizio, il robot prende la spazzatura e la porta nell'inceneritore, quindi il Led dovrebbe essere acceso perchè l'inceneritore sta bruciando, ma nello stesso momento il container della
+  cenere è vuoto, quindi il Led dovrebbe lampeggiare.
+
+
+
+  
+  
+  
