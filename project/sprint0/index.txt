@@ -26,49 +26,71 @@ Cosa riceve l'inceneritore per attivarsi e bruciare la spazzatura? E chi gli man
   cenere è vuoto, quindi il Led dovrebbe lampeggiare.
 
 SOSTANTIVI/ENTITA':
-  - WIS
-  - OpRobot
-  - Incinerator
-  - Service Area
-  - Waste Storage Container
-  - Roll Packets
-  - Ash Storage Container
-  - Monitoring Device
-  - Sonar
-  - Led
-  - BURNIN port
-  - BURNOUT port
-  - WASTEIN port
-  - ASHOUT port
-  - HOME location
-  - Scale (weighing device)
-  - External Agent WasteStorage ?????
-  - External Agent AshStorage ?????
+  - WIS                       -- ACTOR
+  - OpRobot                   -- ACTOR
+  - Incinerator               -- ACTOR
+  - Service Area              -- POJO (appartiene a WIS)
+  - Waste Storage Container   -- POJO (appartiene al weighing device)
+  - Roll Packets              -- NULLA (MA FORSE POJO)
+  - Ash Storage Container     -- POJO (appartiene a monitoring device)
+  - Monitoring Device         -- ACTOR
+  - Sonar                     -- POJO (appartiene a monitoring device)
+  - Warning Device            -- ACTOR 
+  - Led                       -- POJO (appartiene a warning device)
+  
+  - BURNIN port               -- SONO POSIZIONI, non li consideriamo come pojo / actors perchè è dove si muove il robot nei vari scenari
+  - BURNOUT port              -- SONO POSIZIONI, non li consideriamo come pojo / actors perchè è dove si muove il robot nei vari scenari
+  - WASTEIN port              -- SONO POSIZIONI, non li consideriamo come pojo / actors perchè è dove si muove il robot nei vari scenari
+  - ASHOUT port               -- SONO POSIZIONI, non li consideriamo come pojo / actors perchè è dove si muove il robot nei vari scenari
+  - HOME location             -- SONO POSIZIONI, non li consideriamo come pojo / actors perchè è dove si muove il robot nei vari scenari
+  - Scale                     -- POJO (appartiene a weighing device)
+  - Weighing device           -- ACTOR
+  - External Agent WasteStorage -- ACTOR
+  - External Agent AshStorage   -- ACTOR
 
 VERBI/AZIONI:
   - Perceive (Incinerator)
+  non lo sappiamo yet
   - Burning (Incinerator)
+    - evento globale al WIS, che aggiornerà a sua volta il WARNING DEVICE tramite una dispatch per accendere / spegnere il POJO LED
   - Emits (Incinerator)
-  - Move to the WASTEIN port (OpRobot)
-  - Get a RP (OpRobot)
-  - Move to the BURNIN port (OpRobot)
-  - Deposit (OpRobot: Incinerator)
+    - evento globale al WIS, che aggiornerà a sua volta l'OpRobot attraverso una dispatch
+  - Move to the WASTEIN port & get RP (OpRobot)
+    - dispatch
+    la move e la get si potrebbero lasciare separate, ma le uniamo perchè attualmente l'unico scopo della porta WASTEIN è di prelevare un RP. nel caso
+    in cui l'OpRobot dovesse fare altro prima di prelevare un RP, allora le separeremmo
+  - Move to the BURNIN port & deposit (OpRobot & OpRobot:incenerator)
+    - dispatch
+    la move e la deposit si potrebbero lasciare separate, ma le uniamo perchè attualmente l'unico scopo della porta WASTEIN è di prelevare un RP. nel caso
+    in cui l'OpRobot dovesse fare altro prima di prelevare un RP, allora le separeremmo
   - Move to the HOME location (OpRobot)
-  - Move to the BURNOUT port (OpRobot)
-  - Extract (OpRobot: Incinerator)
-  - Move to the ASHOUT port (OpRobot)
-  - Deposit (OpRobot: AshStorage)
-  - Reports (Scale)
-  - Acquire (WIS)
+    - dispatch
+  - Move to the BURNOUT port & extract (OpRobot & OpRobot:incenerator)
+    - dispatch
+    la move e la extract si potrebbero lasciare separate, ma le uniamo perchè attualmente l'unico scopo della porta WASTEIN è di prelevare un RP. nel caso
+    in cui l'OpRobot dovesse fare altro prima di prelevare un RP, allora le separeremmo
+  - Move to the ASHOUT port & deposit (OpRobot & OpRobot:AshStorage)
+    - dispatch
+    la move e la deposit si potrebbero lasciare separate, ma le uniamo perchè attualmente l'unico scopo della porta WASTEIN è di prelevare un RP. nel caso
+    in cui l'OpRobot dovesse fare altro prima di prelevare un RP, allora le separeremmo
+  - Reports (Weighing Device)
+    - dispatch
   - Measures (Sonar)
+    - dispatch
   - IsConsideredFull (AshStorage)
+    - request fatta dal WIS->AshStorage
   - IsOn (Led)
+    - request fatta dal WIS->Monitoring Device
   - IsOff (Led)
+    - request fatta dal WIS->Monitoring Device
   - Blinks (Led)
+    - request fatta dal WIS->Monitoring Device
   - IsEmpty (AshStorage)
-
-  - PutInto (External Agent WasteStorage) ?????
-  - Remove (External Agent AshStorage) ?????
+    - request fatta dal WIS->AshStorage
+  - PutInto (External Agent WasteStorage)
+    - dispatch->WasteStorage
+  - Remove (External Agent AshStorage)
+    - dispatch->AshStorage
 
 
 
