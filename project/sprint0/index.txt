@@ -95,8 +95,6 @@ VERBI/AZIONI:
 
 
 NEXT STEPS:
-Per ogni entità, definire se sono Pojo o Actors.
-Per ogni verbo, vedere a quali Actor o Pojo si riferiscono. Se sono messaggi o semplici print e che tipo di messaggi rispetto a quell'Actor.
 Leggendo la UserStory dobbiamo ipotizzare un TestPlan.
 Altro?
 Fine Sprint0
