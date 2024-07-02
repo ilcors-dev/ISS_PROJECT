@@ -1,0 +1,154 @@
+System wis24
+
+// ----- Messaggi per le interazioni con il basic robot ------------
+Request engage			: engage(OWNER,STEPTIME) //richiesta di ingaggio
+Reply	engagedone		: engagedone(ARG) //risposta di conferma di ingaggio
+Reply	engagerefused	: engagerefused(ARG) //risposta di rifiuto di ingaggio
+
+//Dispatch disengage		: disengage(ARG) //messaggio di disingaggio
+//------------------------------------------------------------------
+
+Dispatch getrp       		: getrp(MOVE)        
+Dispatch endburnindeposit 	: endburnindeposit(WEIGHRP)
+Dispatch gohome 			: gohome(X,Y)
+
+Dispatch getash				: getash(MOVE)
+Dispatch endashdeposit 		: endashdeposit(WEIGHASH)
+
+Context ctxwis24  ip [host="localhost" port=8120     ]
+Context ctxbasicrobot ip [host="127.0.0.1" port=8020]
+
+ExternalQActor basicrobot context ctxbasicrobot
+
+QActor wis context ctxwis24{
+	
+	State s0 initial{
+		
+	}
+}
+
+QActor oprobot context ctxwis24{
+	[#
+		var OWNER = "$name"; 
+		var STEPSDONE=0;
+		var N = 0
+	#]
+	
+	State s0 initial{
+		println("$name request engage") color green
+		request basicrobot -m engage : engage($OWNER, 350)
+	}Transition t0 
+		whenReply engagedone     ->  inHome
+		whenReply engagerefused  ->  handleEngageRefused
+		
+	State handleEngageRefused{
+    	println("engage $name refused")
+    }
+    
+	State inHome { 
+		println("$name - waiting in home...") color green
+		
+	}Transition t0
+		whenMsg getrp -> execGetrp
+		whenMsg getash -> execGetAsh
+	
+	State execGetrp{ //moving to wastein port
+		printCurrentMessage 
+		onMsg( getrp : getrp(MOVE) ){
+			println("$name - Moving to the WASTEIN PORT") color green	      
+			delay 2000 //simulating oprobot taking time to go to wastein port
+			
+			println("$name - getting a rp") color green
+	 		delay 2000 //simulating deposit action
+		} 
+		
+	 }
+	 Goto burninPort
+	 
+	 State execGetAsh{ //moving to burnout port
+		printCurrentMessage 
+		onMsg( getash : getash(MOVE) ){
+  			println("$name - Moving to the BORNOUT PORT") color green	      
+			delay 2000 //simulating oprobot taking time to go to bornout port
+			
+			println("$name - extract ash") color green
+	 		delay 2000 //simulating extracting action
+		} 
+		
+	 }
+	 Goto ashoutPort
+	 
+	 State burninPort{
+	 	println("$name - Moving to the BURNIN PORT") color green	      
+		delay 2000 //simulating oprobot taking time to go to burnin port
+		
+	 	println("$name - depositing a rp") color green
+	 	delay 2000 //simulating deposit action
+	 	
+	 	forward wis -m endburnindeposit : endburnindeposit(50) //50 is the weight of a RP
+	 	
+	 }Transition t0
+	 	whenMsg gohome -> moveToHome
+	 	
+	 State moveToHome{
+	 	println("$name - Moving to HOME") color green	      
+		delay 2000 //simulating oprobot taking time to go to home
+		
+	 }Goto inHome
+	 
+	 State ashoutPort{
+	 	println("$name - Moving to the ASHOUT PORT") color green	      
+		delay 2000 //simulating oprobot taking time to go to ashout port
+		
+	 	println("$name - depositing ash") color green
+	 	delay 2000 //simulating deposit action
+	 	
+	 	forward wis -m endashdeposit : endashdeposit(50) //we assume that the ash weighs as a RP
+	 }Transition t0
+	 	whenMsg gohome -> moveToHome
+	 	whenMsg getrp -> execGetrp
+    	
+}
+    
+
+QActor incinerator context ctxwis24{
+	
+	State s0 initial{
+		
+	}
+}
+
+QActor monitoringdevice context ctxwis24{
+	
+	State s0 initial{
+		
+	}
+}
+
+QActor warningdevice context ctxwis24{
+	
+	State s0 initial{
+		
+	}
+}
+
+QActor weighingdevice context ctxwis24{
+	
+	State s0 initial{
+		
+	}
+}
+
+QActor wastestoragemock context ctxwis24{
+	
+	State s0 initial{
+		
+	}
+}
+
+QActor ashstoragemock context ctxwis24{
+	
+	State s0 initial{
+		
+	}
+}

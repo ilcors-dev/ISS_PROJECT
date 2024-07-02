@@ -1,0 +1,5 @@
+{"actor":"oprobot", "msgType":"dispatch", "curstate":"inHome", "nextstate":"execGetrp", "msgId":"getrp"}
+{"actor":"oprobot", "msgType":"dispatch", "curstate":"inHome", "nextstate":"execGetAsh", "msgId":"getash"}
+{"actor":"oprobot", "msgType":"dispatch", "curstate":"burninPort", "nextstate":"moveToHome", "msgId":"gohome"}
+{"actor":"oprobot", "msgType":"dispatch", "curstate":"ashoutPort", "nextstate":"moveToHome", "msgId":"gohome"}
+{"actor":"oprobot", "msgType":"dispatch", "curstate":"ashoutPort", "nextstate":"execGetrp", "msgId":"getrp"}
