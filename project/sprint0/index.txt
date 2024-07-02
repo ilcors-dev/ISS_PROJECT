@@ -95,6 +95,7 @@ VERBI/AZIONI:
 
 
 NEXT STEPS:
+Scrivere comportamento degli attori restanti
 Leggendo la UserStory dobbiamo ipotizzare un TestPlan.
 Altro?
 Fine Sprint0
