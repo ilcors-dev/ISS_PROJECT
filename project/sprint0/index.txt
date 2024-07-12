@@ -35,8 +35,7 @@ SOSTANTIVI/ENTITA':
   - Ash Storage Container     -- POJO (appartiene a monitoring device)
   - Monitoring Device         -- ACTOR
   - Sonar                     -- POJO (appartiene a monitoring device)
-  - Warning Device            -- ACTOR 
-  - Led                       -- POJO (appartiene a warning device)
+  - Led                       -- POJO (appartiene a monitoring device)
   
   - BURNIN port               -- SONO POSIZIONI, non li consideriamo come pojo / actors perchè è dove si muove il robot nei vari scenari
   - BURNOUT port              -- SONO POSIZIONI, non li consideriamo come pojo / actors perchè è dove si muove il robot nei vari scenari
@@ -52,7 +51,7 @@ VERBI/AZIONI:
   - Perceive (Incinerator)
   non lo sappiamo yet
   - Burning (Incinerator)
-    - evento globale al WIS, che aggiornerà a sua volta il WARNING DEVICE tramite una dispatch per accendere / spegnere il POJO LED
+    - evento globale al WIS, che aggiornerà a sua volta il MONITORING DEVICE tramite una dispatch per accendere / spegnere il POJO LED
   - Emits (Incinerator)
     - evento globale al WIS, che aggiornerà a sua volta l'OpRobot attraverso una dispatch
   - Move to the WASTEIN port & get RP (OpRobot)
