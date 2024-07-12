@@ -35,7 +35,8 @@ SOSTANTIVI/ENTITA':
   - Ash Storage Container     -- POJO (appartiene a monitoring device)
   - Monitoring Device         -- ACTOR
   - Sonar                     -- POJO (appartiene a monitoring device)
-  - Led                       -- POJO (appartiene a monitoring device)
+  - Warning Device            -- ACTOR 
+  - Led                       -- POJO (appartiene a warning device)
   
   - BURNIN port               -- SONO POSIZIONI, non li consideriamo come pojo / actors perchè è dove si muove il robot nei vari scenari
   - BURNOUT port              -- SONO POSIZIONI, non li consideriamo come pojo / actors perchè è dove si muove il robot nei vari scenari
@@ -51,7 +52,7 @@ VERBI/AZIONI:
   - Perceive (Incinerator)
   non lo sappiamo yet
   - Burning (Incinerator)
-    - evento globale al WIS, che aggiornerà a sua volta il MONITORING DEVICE tramite una dispatch per accendere / spegnere il POJO LED
+    - evento globale al WIS, che aggiornerà a sua volta il WARNING DEVICE tramite una dispatch per accendere / spegnere il POJO LED
   - Emits (Incinerator)
     - evento globale al WIS, che aggiornerà a sua volta l'OpRobot attraverso una dispatch
   - Move to the WASTEIN port & get RP (OpRobot)
@@ -75,7 +76,7 @@ VERBI/AZIONI:
   - Reports (Weighing Device)
     - dispatch
   - Measures (Sonar)
-    - dispatch
+    - Event (va dentro all'attore del Raspberry)
   - IsConsideredFull (AshStorage)
     - request fatta dal WIS->AshStorage
   - IsOn (Led)
@@ -91,10 +92,25 @@ VERBI/AZIONI:
   - Remove (External Agent AshStorage)
     - dispatch->AshStorage
 
-
-
 NEXT STEPS:
 Scrivere comportamento degli attori restanti
 Leggendo la UserStory dobbiamo ipotizzare un TestPlan.
 Altro?
 Fine Sprint0
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+12/07/2024
+Scritto comportamento di:
+  - Incinerator, è in attesa del WIS che gli dice di partire (StartIncinerator), dopo BTIME secondi finisce e avvisa il WIS (FinishBurning), ritorna allo stato iniziale.
+  - MonitoringDevice, (abbiamo eliminato WarningDevice e unito il tutto), abbiamo creato monitoringdevice.qak che viene usato come attore esterno. L'evento Measure viene lanciato dal sonar al WIS ogni qualvolta si verifica un cambio del valore misurato dal Sonar. Il MonitoringDevice farà da Observer che riceverà evento e lancerà dispatch al WIS. Il WIS decreterà se è stata raggiunta la soglia.
+      Il led si trova sul Raspberry, perciò verrà gestito indipendentemente, non sarà il WIS a comandarlo: usa i parametri del Sonar ma anche l'evento dell'inceneritore. Perciò creiamo anche un observer per il led/monitoringDevice.
+  - WeighingDevice, observer che riceve evento dall'attore esterno weighingdevice.qak e lancia dispatch rpInWaste contenente rpCount=weight/WRP (dove WRP=50kg e weight è il parametro dell'evento). L'evento del WeighingDevice deve essere inviato ogni qualvolta si verifica un cambio del valore misurato da Scale.
+
+Creato 2 file Python, sonar.py e scale,py, che fungono da mock e creano valori casuali che verrano utilizzati come misure dai qak.
+
+NEXT STEPS:
+Scrivere comportamento del WIS
+Leggendo la UserStory dobbiamo ipotizzare un TestPlan.
+Altro?
+Fine Sprint0
+
