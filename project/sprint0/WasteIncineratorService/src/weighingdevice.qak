@@ -1,0 +1,57 @@
+System weighingdevicewis24
+
+Event scaleData : weight(W)
+
+Context ctxweighingdevicewis24 ip [host="localhost" port= 8130 ]
+Context ctxwis24      ip [host="IPTOINSERT" port= 8120 ]
+
+QActor weighingdevice context ctxweighingdevicewis24{
+	[# 
+		lateinit var reader : java.io.BufferedReader
+	    lateinit var p : Process	
+	    var Weight = 0
+	    var PreviousWeight = 0
+	#]
+	
+	State s0 initial{
+		println("$name | scale starts") 
+	 	[#
+			p       = Runtime.getRuntime().exec("python scale.py")
+			reader  = java.io.BufferedReader(java.io.InputStreamReader(p.getInputStream()))	
+		#]		
+	}
+	
+	Goto readScaleData
+	
+	State readScaleData{
+		[# 
+			var data = reader.readLine()
+			CommUtils.outyellow("$name with python: data = $data") 
+			if(data != null) {
+				try { 
+					val vd = data.toFloat()
+					val v = vd.toInt()
+					Weight = v
+				} catch(e: Exception) {
+					CommUtils.outred("$name readScaleDataERROR: $e ")
+				}
+			}
+		#]	
+		
+		if [# Weight > 0 && Weight != PreviousWeight #] {
+			[# PreviousWeight = Weight #] 
+		    println("$name with python: data = $data"   ) color yellow
+			// emitlocalstream measure : Weight($Weight)
+			emit scaleData : weight($Weight)			 
+		}
+		
+		delay 5000
+	}
+	Goto readScaleData
+}
+
+QActor wastestoragemock context ctxwis24{
+	State s0 initial{
+		
+	}
+}

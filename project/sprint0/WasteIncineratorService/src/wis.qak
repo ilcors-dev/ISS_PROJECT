@@ -15,13 +15,36 @@ Dispatch gohome 			: gohome(X,Y)
 Dispatch getash				: getash(MOVE)
 Dispatch endashdeposit 		: endashdeposit(WEIGHASH)
 
-Context ctxwis24  ip [host="localhost" port=8120     ]
+// ipotizzato da noi, dato che il WIS è il cervellone e controlla il resto
+// da chiedere in caso al committente
+Dispatch startIncinerator   : startIncinerator(BTIME)
+
+// evento ricevuto dal monitoring device (external actor che esegue sul raspberry)
+Event sonarData             : distance(D)
+// dispatch lanciata dal monitoringdeviceobserver
+Dispatch ashMeasurement     : ashMeasurement(D)
+
+Event burning               : burning(START_TIME)   // incinerator starts burning
+Event finishedBurning       : finishedBurning(TIME_ELAPSED)   // end of burning phase
+
+// event fired from the weighing device
+Event reports               : reports(WEIGHRP)
+// dispatch lanciata dall'observer del wastestorage
+Dispatch rpInWaste          : rpInWaste(RPCOUNT)
+
+// SONAR
+Dispatch sonarstart : sonarstart(X)
+Dispatch sonarstop  : sonarstop(X)
+Event sonardata : distance(D)
+Dispatch doread : doread(X)  //byNat
+
+Context ctxwis24  ip [host="localhost" port=8120]
 Context ctxbasicrobot ip [host="127.0.0.1" port=8020]
 
 ExternalQActor basicrobot context ctxbasicrobot
 
 QActor wis context ctxwis24{
-	
+	[#  #]
 	State s0 initial{
 		
 	}
@@ -59,7 +82,7 @@ QActor oprobot context ctxwis24{
 			delay 2000 //simulating oprobot taking time to go to wastein port
 			
 			println("$name - getting a rp") color green
-	 		delay 2000 //simulating deposit action
+	 		delay 2000 //simulating extraction action
 		} 
 		
 	 }
@@ -112,42 +135,93 @@ QActor oprobot context ctxwis24{
     
 
 QActor incinerator context ctxwis24{
-	
 	State s0 initial{
-		
+		println("$name STARTS") color magenta
 	}
+	
+	Transition t0
+	 	whenMsg startIncinerator -> startBurning
+	 	
+ 	State startBurning {
+		printCurrentMessage 
+		onMsg(startIncinerator : startIncinerator(BTIME)){
+			[# var BurnTime = payloadArg(0).toInt()	#]
+  			println("$name - Start burning phase") color magenta	      
+			emit burning : burning(0)
+			
+			delayVar BurnTime 
+			
+			println("$name - Finished burning RP") color magenta
+			emit finishedBurning : finishedBurning(BurnTime)
+		}
+ 	}
+ 	
+	Transition t0
+	 	whenMsg startIncinerator -> startBurning
 }
 
-QActor monitoringdevice context ctxwis24{
-	
+/**
+ * Handles sonar & led communication, as an observer
+ */
+QActor monitoringdeviceobserver context ctxwis24{
 	State s0 initial{
-		
+		println("$name STARTS") color magenta
 	}
+	
+	Transition t0
+		whenEvent sonarData -> handleAshMeasurement
+		
+	State handleAshMeasurement {
+		printCurrentMessage
+		
+		onMsg(sonarData : distance(D)){
+			[# var dd = payloadArg(0).toInt()	#]
+  			println("$name - received measurement of ash $dd") color magenta	      
+			
+			forward wis -m ashMeasurement : ashMeasurement(dd)
+		}
+	}
+	
+	Transition t0
+		whenEvent sonarData -> handleAshMeasurement
 }
 
-QActor warningdevice context ctxwis24{
-	
+/**
+ * Handles waste storage communication, as an observer
+ */
+QActor weighingdeviceobserver context ctxwis24{
+	[# val WRP = 50 #]
 	State s0 initial{
-		
+		println("$name STARTS") color magenta
 	}
-}
+	
+	Transition t0
+		whenEvent reports -> handleScaleData
+		
+	State handleScaleData {
+		printCurrentMessage
+		
+		onMsg(reports : reports(WEIGHRP)){
+			[#
+				var weight = payloadArg(0).toInt()
+				var rpCount = weight / WRP;
+			#]	      
 
-QActor weighingdevice context ctxwis24{
-	
-	State s0 initial{
-		
+			forward wis -m rpInWaste : rpInWaste(rpCount)
+		}
 	}
+	
+	Transition t0
+		whenEvent reports -> handleScaleData
 }
 
 QActor wastestoragemock context ctxwis24{
-	
 	State s0 initial{
 		
 	}
 }
 
 QActor ashstoragemock context ctxwis24{
-	
 	State s0 initial{
 		
 	}

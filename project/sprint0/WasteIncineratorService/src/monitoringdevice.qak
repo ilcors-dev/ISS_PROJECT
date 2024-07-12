@@ -1,0 +1,90 @@
+System monitoringdevicewis24
+
+/*
+ * Sistema che funziona su RaspberryPi
+ * FA PARTE DEL SISTEMA WIS24 e 
+ * RICHIEDE la parte ctxwis24
+ * monitoringdevice : attiva il sonar
+ *               emitlocalstream sonardata:distance(D)	
+ * datacleaner : subscribeTo monitoringdevice for sonardata 
+ *               emette l'evento dLimitReached:dLimitReached(D) quando D >= DLIMIT, ovvero l'ashstorage supera la soglia DLIMIT
+ */
+Event sonarData : distance(D)   //emitted  by monitoringdevice or (better) by datacleaner
+// Event dLimitReached : dLimitReached(D)   //emitted  by datacleaner
+
+Context ctxmonitoringdevice24 ip [host="localhost" port= 8128 ]
+Context ctxwis24      ip [host="IPTOINSERT" port= 8120 ]  
+ 
+QActor monitoringdevice context ctxmonitoringdevice24{
+	[# 
+		lateinit var reader : java.io.BufferedReader
+	    lateinit var p : Process	
+	    var Distance = 0
+	    var PreviousDistance = 0
+	#]
+	
+	State s0 initial{
+		println("$name | monitoring device") 
+	 	[#
+			p       = Runtime.getRuntime().exec("python sonar.py")
+			reader  = java.io.BufferedReader(java.io.InputStreamReader(p.getInputStream()))	
+		#]		
+	}
+	
+	Goto readSonarData
+	
+	State readSonarData{
+		[# 
+			var data = reader.readLine()
+			CommUtils.outyellow("$name with python: data = $data") 
+			if(data != null) {
+				try { 
+					val vd = data.toFloat()
+					val v = vd.toInt()
+					Distance = v				
+				} catch(e: Exception) {
+					CommUtils.outred("$name readSonarDataERROR: $e ")
+				}
+			}
+		#]	
+		
+		if [# Distance > 0 && Distance != PreviousDistance #] {
+			[# PreviousDistance = Distance #] 
+		    println("$name with python: data = $data"   ) color yellow
+			// emitlocalstream measure : distance($Distance)
+			emit sonarData : distance($Distance)			 
+		}
+		
+		delay 5000
+		//autodispatch doread : doread(1)
+	}
+	Goto readSonarData
+}//monitoringdevice
+
+
+/**
+QActor datacleaner context ctxmonitoringdevice24 {
+	[#
+		var D = 0;
+	#]
+	State s0 initial {
+		delay 1000
+		subscribeTo monitoringdevice for measure		
+		println("$name subscribed to monitoringdevice") color blue
+	}
+	Transition t0 whenEvent measure -> filter
+	
+	State filter {
+		println("$name D=$D") color black	
+		onMsg(measure : distance(D)) {
+	      	[#  D = payloadArg(0).toInt() #]	      	
+	      	println("$name D=$D") color black	
+	      	if [# D >= DLIMIT #] {
+	      		println("$name emit dLimitReached") color magenta	
+	 			emit dLimitReached : dLimitReached($D)
+	     	}
+     	}
+	}	
+	Transition t0 whenEvent measure -> filter
+}
+*/
