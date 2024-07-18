@@ -108,6 +108,10 @@ Scritto comportamento di:
 
 Creato 2 file Python, sonar.py e scale,py, che fungono da mock e creano valori casuali che verrano utilizzati come misure dai qak.
 
+18/07/2024
+Scritto comportamento del WIS.
+WIS: Quando c'è un RP nel WasteStorage (rpInWaste) si aggiorna il counter degli rp e si invia segnale al'oprobot per farlo partire (updateRPCount)
+
 NEXT STEPS:
 Scrivere comportamento del WIS
 Leggendo la UserStory dobbiamo ipotizzare un TestPlan.
