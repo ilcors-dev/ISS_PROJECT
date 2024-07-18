@@ -110,11 +110,20 @@ Creato 2 file Python, sonar.py e scale,py, che fungono da mock e creano valori c
 
 18/07/2024
 Scritto comportamento del WIS.
-WIS: Quando c'è un RP nel WasteStorage (rpInWaste) si aggiorna il counter degli rp e si invia segnale al'oprobot per farlo partire (updateRPCount)
+WIS: Si inizializzano variabili e poi si controlla lo stato (checkStatus). Da qui, si controllano le variabili e a seconda del dispatch ricevuto:
+    - si aggiorna il counter degli rp (updateRPCount)
+    - si controlla e si aggiorna l'ashlevel
+    - si controlla lo status dell'inceneritore (se ha iniziato a bruciare o ha appena finito) e si fa muovere oprobot
+
+xx Variabile INHOME messa al fine di sapere se l'oprobot è in home per evitare di mandargli messaggi inutili in checkStatus, verrà poi sostituita dal sistema di posizionamento dell'oprobot da implementare successivamente. Per adesso oprobot dice quando è nlla home e lo comunica al wis che si occuperà di aggiornare lo status.
+xx Argomenti (X,Y) momentaneamente usati, ma andranno sostituiti dal sistema di posizionamento
+
 
 NEXT STEPS:
-Scrivere comportamento del WIS
 Leggendo la UserStory dobbiamo ipotizzare un TestPlan.
-Altro?
+Controllare commenti nel codice e tradurli tutti in inglese
+Scrivere documento
 Fine Sprint0
 
+*** nello sprint successivo: 
+    - Sistema di posizionamento
