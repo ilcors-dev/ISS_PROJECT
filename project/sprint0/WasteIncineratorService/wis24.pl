@@ -10,7 +10,7 @@ dispatch( getash, getash(X,Y) ).
 dispatch( endashdeposit, endashdeposit(WEIGHASH) ).
 dispatch( startIncinerator, startIncinerator(BTIME) ).
 event( sonarData, distance(D) ).
-dispatch( ashMeasurement, ashMeasurement(D) ).
+dispatch( ashMeasurement, ashMeasurement(rpCount) ).
 event( burning, burning(START_TIME) ).
 event( finishedBurning, finishedBurning(TIME_ELAPSED) ).
 event( reports, reports(WEIGHRP) ).

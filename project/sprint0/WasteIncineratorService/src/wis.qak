@@ -24,7 +24,7 @@ Dispatch startIncinerator   : startIncinerator(BTIME)
 // evento ricevuto dal monitoring device (external actor che esegue sul raspberry)
 Event sonarData             : distance(D)
 // dispatch lanciata dal monitoringdeviceobserver
-Dispatch ashMeasurement     : ashMeasurement(D)
+Dispatch ashMeasurement     : ashMeasurement(rpCount)
 
 Event burning               : burning(START_TIME)   // incinerator starts burning
 Event finishedBurning       : finishedBurning(TIME_ELAPSED)   // end of burning phase
@@ -47,7 +47,7 @@ ExternalQActor basicrobot context ctxbasicrobot
 
 QActor wis context ctxwis24{
 	[# 
-		var ASHLEVEL=0;
+		var ASHCONT=4;	//max 4 rp in ash storage (capacity)
 		var RPCONT=0;
 		var INCSTATUS=0; //0 libero, 1 occupato
 		var INHOME=0; //0 in home, 1 non in home
@@ -66,10 +66,10 @@ QActor wis context ctxwis24{
   	}
   	Goto checkStatus
   		
-	State updateAshLevel{ //update Ash level and send command to oprobot
+	State updateAshLevel{ //update Ash cont and send command to oprobot
 		printCurrentMessage
 		onMsg(ashMeasurement : ashMeasurement(D)){
-			[# ASHLEVEL = payloadArg(0).toInt()	#]
+			[# ASHCONT = payloadArg(0).toInt()	#]
   			println("$name - Update Ash level") color magenta
   		}
   	}
@@ -102,7 +102,7 @@ QActor wis context ctxwis24{
 	State checkStatus{
 		printCurrentMessage 
 		[# 
-			if (RPCONT > 0 && ASHLEVEL < 4 && INCSTATUS == 0) {
+			if (RPCONT > 0 && ASHCONT != 0 && INCSTATUS == 0) {
 		#]
 				forward oprobot -m getrp : getrp(X,Y) //da modificare con le coordinate reali
 		[# 
@@ -238,6 +238,7 @@ QActor incinerator context ctxwis24{
  * Handles sonar & led communication, as an observer
  */
 QActor monitoringdeviceobserver context ctxwis24{
+	[# val LRP = 50 #]
 	State s0 initial{
 		println("$name STARTS") color magenta
 	}
@@ -249,10 +250,13 @@ QActor monitoringdeviceobserver context ctxwis24{
 		printCurrentMessage
 		
 		onMsg(sonarData : distance(D)){
-			[# var dd = payloadArg(0).toInt()	#]
-  			println("$name - received measurement of ash $dd") color magenta	      
+			[#
+				var dd = payloadArg(0).toInt()
+				var rpCount = dd / LRP;
+			#]
+  			println("$name - received measurement of ash $rpCount") color magenta	      
 			
-			forward wis -m ashMeasurement : ashMeasurement(dd)
+			forward wis -m ashMeasurement : ashMeasurement(rpCount)
 		}
 	}
 	

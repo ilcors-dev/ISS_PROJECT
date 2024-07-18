@@ -21,6 +21,7 @@ class Monitoringdeviceobserver ( name: String, scope: CoroutineScope, isconfined
 	}
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
+		 val LRP = 50  
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -38,9 +39,11 @@ class Monitoringdeviceobserver ( name: String, scope: CoroutineScope, isconfined
 						 	   
 						if( checkMsgContent( Term.createTerm("distance(D)"), Term.createTerm("distance(D)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								 var dd = payloadArg(0).toInt()	 
-								CommUtils.outmagenta("$name - received measurement of ash $dd")
-								forward("ashMeasurement", "ashMeasurement(dd)" ,"wis" ) 
+								
+												var dd = payloadArg(0).toInt()
+												var rpCount = dd / LRP;
+								CommUtils.outmagenta("$name - received measurement of ash $rpCount")
+								forward("ashMeasurement", "ashMeasurement(rpCount)" ,"wis" ) 
 						}
 						//genTimer( actor, state )
 					}

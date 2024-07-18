@@ -22,7 +22,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		 
-				var ASHLEVEL=0;
+				var ASHCONT=4;	//max 4 rp in ash storage (capacity)
 				var RPCONT=0;
 				var INCSTATUS=0; //0 libero, 1 occupato
 				var INHOME=0; //0 in home, 1 non in home
@@ -57,9 +57,9 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 					action { //it:State
 						CommUtils.outcyan("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
 						 	   
-						if( checkMsgContent( Term.createTerm("ashMeasurement(D)"), Term.createTerm("ashMeasurement(D)"), 
+						if( checkMsgContent( Term.createTerm("ashMeasurement(rpCount)"), Term.createTerm("ashMeasurement(D)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								 ASHLEVEL = payloadArg(0).toInt()	 
+								 ASHCONT = payloadArg(0).toInt()	 
 								CommUtils.outmagenta("$name - Update Ash level")
 						}
 						//genTimer( actor, state )
@@ -113,7 +113,7 @@ class Wis ( name: String, scope: CoroutineScope, isconfined: Boolean=false  ) : 
 						CommUtils.outcyan("$name in ${currentState.stateName} | $currentMsg | ${Thread.currentThread().getName()} n=${Thread.activeCount()}")
 						 	   
 						 
-									if (RPCONT > 0 && ASHLEVEL < 4 && INCSTATUS == 0) {
+									if (RPCONT > 0 && ASHCONT != 0 && INCSTATUS == 0) {
 						forward("getrp", "getrp(X,Y)" ,"oprobot" ) 
 						 
 										INHOME = 1
