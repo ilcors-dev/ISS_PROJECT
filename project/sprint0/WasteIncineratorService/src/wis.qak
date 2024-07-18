@@ -8,11 +8,13 @@ Reply	engagerefused	: engagerefused(ARG) //risposta di rifiuto di ingaggio
 //Dispatch disengage		: disengage(ARG) //messaggio di disingaggio
 //------------------------------------------------------------------
 
-Dispatch getrp       		: getrp(MOVE)        
+Dispatch getrp       		: getrp(X,Y)        
 Dispatch endburnindeposit 	: endburnindeposit(WEIGHRP)
 Dispatch gohome 			: gohome(X,Y)
 
-Dispatch getash				: getash(MOVE)
+Dispatch inhome				: inhome(STATUS)
+
+Dispatch getash				: getash(X,Y)
 Dispatch endashdeposit 		: endashdeposit(WEIGHASH)
 
 // ipotizzato da noi, dato che il WIS è il cervellone e controlla il resto
@@ -44,10 +46,82 @@ Context ctxbasicrobot ip [host="127.0.0.1" port=8020]
 ExternalQActor basicrobot context ctxbasicrobot
 
 QActor wis context ctxwis24{
-	[#  #]
+	[# 
+		var ASHLEVEL=0;
+		var RPCONT=0;
+		var INCSTATUS=0; //0 libero, 1 occupato
+		var INHOME=0; //0 in home, 1 non in home
+	#]
 	State s0 initial{
-		
+		println("$name start") color green
 	}
+	Goto checkStatus
+		
+	State updateRPCont{ //update RPCounter and send command to oprobot
+		printCurrentMessage
+		onMsg(rpInWaste : rpInWaste(RPCOUNT)){
+			[# RPCONT = payloadArg(0).toInt()	#]
+  			println("$name - Update RP counter") color magenta
+  		}
+  	}
+  	Goto checkStatus
+  		
+	State updateAshLevel{ //update Ash level and send command to oprobot
+		printCurrentMessage
+		onMsg(ashMeasurement : ashMeasurement(D)){
+			[# ASHLEVEL = payloadArg(0).toInt()	#]
+  			println("$name - Update Ash level") color magenta
+  		}
+  	}
+  	Goto checkStatus	
+  	
+	State updateIncStatus{ //update incinerator status and send command to oprobot
+		printCurrentMessage
+		onMsg(burning : burning(START_TIME)){
+			[# INCSTATUS = 1	#]
+  			println("$name - start incinerator, update status") color magenta
+  		}
+  		onMsg(finishedBurning : finishedBurning(TIME_ELAPSED)){
+			[# INCSTATUS = 0	#]
+  			println("$name - finish incinerator, update status") color magenta
+  			forward oprobot -m getash : getash(X,Y) //da modificare con le coordinate reali
+  			[# INHOME = 1	#]
+  		}
+  	}
+  	Goto checkStatus
+  	
+  	State updateInHomeStatus{ //update in home status and send command to oprobot
+		printCurrentMessage
+		onMsg(inhome : inhome(STATUS)){
+			[# INHOME = payloadArg(0).toInt()	#]
+  			println("$name - update in home status") color magenta
+  		}
+  	}
+  	Goto checkStatus
+	
+	State checkStatus{
+		printCurrentMessage 
+		[# 
+			if (RPCONT > 0 && ASHLEVEL < 4 && INCSTATUS == 0) {
+		#]
+				forward oprobot -m getrp : getrp(X,Y) //da modificare con le coordinate reali
+		[# 
+				INHOME = 1
+			} else if (INHOME != 0) {
+		#]
+				forward oprobot -m gohome : gohome(0,0)
+		[# 
+			}
+		#]
+	}
+	Transition t0 
+		whenMsg rpInWaste	->	updateRPCont
+		whenMsg ashMeasurement	-> updateAshLevel
+		whenEvent burning	-> updateIncStatus
+		whenEvent finishedBurning	-> updateIncStatus
+		whenMsg endburnindeposit	-> checkStatus
+		whenMsg endashdeposit	-> checkStatus
+		whenMsg inhome	->	updateInHomeStatus
 }
 
 QActor oprobot context ctxwis24{
@@ -70,14 +144,14 @@ QActor oprobot context ctxwis24{
     
 	State inHome { 
 		println("$name - waiting in home...") color green
-		
+		forward wis -m inhome : inhome(0)
 	}Transition t0
 		whenMsg getrp -> execGetrp
 		whenMsg getash -> execGetAsh
 	
 	State execGetrp{ //moving to wastein port
 		printCurrentMessage 
-		onMsg( getrp : getrp(MOVE) ){
+		onMsg( getrp : getrp(X,Y) ){
 			println("$name - Moving to the WASTEIN PORT") color green	      
 			delay 2000 //simulating oprobot taking time to go to wastein port
 			
@@ -90,7 +164,7 @@ QActor oprobot context ctxwis24{
 	 
 	 State execGetAsh{ //moving to burnout port
 		printCurrentMessage 
-		onMsg( getash : getash(MOVE) ){
+		onMsg( getash : getash(X,Y) ){
   			println("$name - Moving to the BORNOUT PORT") color green	      
 			delay 2000 //simulating oprobot taking time to go to bornout port
 			
@@ -145,7 +219,7 @@ QActor incinerator context ctxwis24{
  	State startBurning {
 		printCurrentMessage 
 		onMsg(startIncinerator : startIncinerator(BTIME)){
-			[# var BurnTime = payloadArg(0).toInt()	#]
+			[# var BurnTime = payloadArg(0).toLong()	#]
   			println("$name - Start burning phase") color magenta	      
 			emit burning : burning(0)
 			
