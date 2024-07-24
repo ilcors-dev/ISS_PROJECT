@@ -311,66 +311,68 @@ class ServiceArea {
 	</code></pre>
 	</br>
 	</br>
-    Nella service area sono presenti delle porte di <span class="red">WASTEIN</span>, <span class="red">ASHOUT</span>, <span class="red">BURNIN</span> e 
-    <span class="red">BURNOUT</span>
-    </br>
-	Per permettere una migliore formalizzazione di questo e successivi elementi, è utile creare una rappresentazione a griglia dell'area. Per farlo si utilizza 
-    come riferimento il <b>DDR robot</b> e si va quindi a dividere la <b>service area</b> in celle di dimensioni <span class="red"><b>NON SI SA, DA DISCUTERE!!!</b></span>, 
-    ovvero della dimensione del robot. E' quindi utile definire il concetto di <b>step</b>, ovvero un movimento elementare che sposta il robot della sua dimensione 
-    (utile per la creazione della rappresentazione in celle e per muovere il robot tra le celle). Le porte <span class="red">WASTEIN</span>, <span class="red">ASHOUT</span>, 
-    <span class="red">BURNIN</span> e <span class="red">BURNOUT</span> diventano quindi celle della griglia, nell'esempio in figura nella posizione <b>(0,4)</b>:
+    Al fine di formalizzare tutti gli elementi presenti nella <b>service area</b>, è utile creare una rappresentazione a griglia dell'area. 
+	Per farlo si utilizza come riferimento il <b>DDR robot</b> e si va quindi a dividere la <b>service area</b> in celle di dimensioni <span class="red"><b>NON SI SA, DA DISCUTERE!!!</b></span>, 
+    ovvero della dimensione del robot. E' necessario quindi, definire il concetto di <b>step</b>, ovvero un movimento elementare che sposta il robot della sua 
+	dimensione (utile per la creazione della rappresentazione in celle e per muovere il robot tra le celle).
 	<blockquote>
-	<a class="reference internal image-reference" href="./immagini/GrigliaRappr.png"><img alt="./immagini/GrigliaRappr.png" class="align-center" src="./immagini/GrigliaRappr.png" style="width: 20%;" /></a>
+		<a class="reference internal image-reference" href="./immagini/GrigliaRappr.png"><img alt="./immagini/GrigliaRappr.png" class="align-center" src="./immagini/GrigliaRappr.png" style="width: 20%;" /></a>
 	</blockquote>
-	Il <b>ColdRoom</b> container è anch'esso rappresentato come una cella della <b>service area</b>, con cui il <b>DDR robot</b> può collidere (è quindi un 
-	ostacolo). <span class="red"><b>MAXW</b></span> è una costante del  <span class="blue">ColdStorageService</span> e indica la quantità massima di cibo depositabile.
-	Il sistema avrà una variabile <code class="language-java">float currentlyStored</code> per indicare la quantità di cibo al momento depositata nella <b>ColdRoom</b>.
-	La ColdRoom è caratterizzata da una porta di ingresso <span class="red">PORT</span>, rappresentata come una cella della griglia adiacente ad essa.
+	All'esterno della <b>service area</b> sono presenti due container, il <span class="blue">WasteStorage</span> e l'<span class="blue">AshStorage</span>, e un <span class="blue">MonitoringDevice</span>.
+	</br>
+	Il <span class="blue">WasteStorage</span> container possiede una bilancia come <b>weighing device</b>, che riporta il peso dei vari Roll Packets (RP) depositati al suo interno. Il container è considerato vuoto 
+	quando il valore della bilancia è approssimativamente zero. Ogni RP ha un peso di circa 50kg, modellato come cosatnte dell'attore. Il container possiede una porta di ingresso <span class="red">WASTEIN</span> all'interno 
+	della <b>service area</b>,	rappresentata come una cella della griglia adiacente ad esso.
 	</br>
 	</br>
-	Un <b>DDR robot</b> è un robot che possiede due ruote motrici sullo stesso asse e una terza ruota condotta (non motrice). Il committente fornisce un servizio con cui è possibile interfacciarsi
-	col robot che sia fisico o virtuale (si veda <a href="../html/BasicRobot23.html">BasicRobot23</a> per ulteriori informazioni). Il servizio è realizzato ad attori ed ha la seguente
-	architettura:
+	L'<span class="blue">AshStorage</span> container può contenere al massimo le ceneri di 3-4 RP. Il container possiede una porta di ingresso <span class="red">ASHOUT</span> all'interno 
+	della <b>service area</b>,	rappresentata come una cella della griglia adiacente ad esso.
+	</br>
+	</br>
+	Il <span class="blue">MonitoringDevice</span> è composto da un <b>Sonar</b> e da un <b>Led</b>, posti su un RaspberryPi.</br>
+	Il <b>Sonar</b> misura il livello delle ceneri nel <span class="blue">AshStorage</span> container. <span class="red"><b>DLIMIT</b></span> indica il valore 
+	limite al di sotto del quale, l'<span class="blue">AshStorage</span> container è considerato pieno.
+	</br>
+	Il <b>Led</b> è usato come <b>warning device</b> e segnala lo stato dell'<span class="blue">Inceneritore</span> e dell'<span class="blue">AshStorage</span>.
+	</br>
+	</br>
+	<span class="red">Da controllare tutta sta frase</span> </br>
+	Il <b>Sonar</b> e il <b>Led</b> sono dispositivi fisici per i quali il committente fornisce software di supporto nell'utilizzo (<a href="..\html\RaspBasicCode.html">RaspBasicCode</a>, 
+	<a href="..\html\RaspApplCode24.html">RaspApplCode24</a> ). Come per l'<span class="blue">OpRobot</span> con il DDR robot, è possibile definire questi due 
+	componenti come un <b>attore</b> posto in un contesto esterno al sistema, che utilizza i dispositivi fisici associati. La distanza <span class="red">DLIMIT</span> sarà quindi una costante dell'attore.
+	<span class="red">in verità nel codice non l'abbiamo messa come costante, dovremmo segnarla come costante (var DLIMIT etc)?</span> </br>
+	</br>
+	</br>
+	All'interno della <b>service area</b> è presente un <span class="blue">Inceneritore</span>, che può bruciare un RP alla volta in <span class="red"><b>BTIME</b></span> 
+	secondi, che sarà una costante dell'attore<span class="red">in verità nel codice noi abbiamo passato direttamente BTIME, dovremmo segnarla come costante (var BTIME etc)?</span>. Sono presenti due porte, rappresentate come celle della griglia, <span class="red">BURNIN</span> e <span class="red">BURNOUT</span>, che permettono 
+	rispettivamente l'ingresso del RP e l'uscita delle ceneri dall'<span class="blue">Inceneritore</span>.
+	</br>
+	</br>
+	Un <b>DDR robot</b> è un robot che possiede due ruote motrici sullo stesso asse e una terza ruota condotta (non motrice). Il committente fornisce un servizio 
+	con cui è possibile interfacciarsi col robot che sia fisico o virtuale (si veda <a href="../html/BasicRobot24.html">BasicRobot24</a> e 
+	<a href="../html/VirtualRobot23.html">VirtualRobot</a> per ulteriori informazioni). Il servizio è realizzato ad attori ed ha la seguente architettura:
 	<blockquote>
-	<a class="reference internal image-reference" href="./immagini/basicrobot23arc.png"><img alt="./immagini/basicrobot23arc.png" class="align-center" src="./immagini/basicrobot23arc.png" style="width: 20%;" /></a>
+	<a class="reference internal image-reference" href="./immagini/ctxbasicrobot24.png"><img alt="./immagini/ctxbasicrobot24.png" class="align-center" src="./immagini/ctxbasicrobot24.png" style="width: 90%;" /></a>
 	</blockquote>
-	Attraverso messaggi di <b>request</b> e <b>dispatch</b> è possibile ingaggiare il robot e farlo muovere nell'area o effettuare piani di mosse. 
+	Attraverso messaggi è possibile ingaggiare il robot e farlo muovere nell'area o effettuare piani di mosse. 
 	</br>
 	</br>
-	Il <span class="blue">Transport trolley</span> è un componente proattivo del sistema che interagisce con il robot tramite l'interfaccia <b>basicrobot23</b>, ed è pertinente modellarlo
-	come un <b>actor</b>. La <span class="red">HOME</span> è anch'essa una cella della rappresentazione a griglia della <b>service area</b>.
-	</br>
-	</br>	
-	Il <span class="blue">Fridge truck</span> è un'entità esterna al sistema che interagisce con il <span class="blue">ColdStorageService</span> tramite l'interfaccia <span class="blue">ServiceAccessGUI</span>
-	</br>
-	Il <b>food load</b> è espresso in kilogrammi ed è un parametro della <b>deposit request</b>.
+	L'<span class="blue">OpRobot</span> è un componente proattivo del sistema che interagisce con il robot tramite l'interfaccia <b>basicrobot24</b>, ed è 
+	pertinente modellarlo come un <b>actor</b>. La <span class="red">HOME</span> è anch'essa una cella della rappresentazione a griglia della <b>service area</b>.</br>
+	L'<span class="blue">OpRobot</span> ha un comportamento specifico in risposta a determinate condizioni. Non è possibile un'immediata formalizzazione e quindi 
+	sarà necessario analizzare questa azione nell'analisi del problema, in quanto si devono gestire le problematiche del far muovere il robot e farlo andare nelle 
+	determinate aree.
 	</br>
 	</br>
-	Una <b>deposit action</b> è una sequenza di azioni che il <span class="blue">Transport trolley</span> esegue quando prende in carica una richiesta di deposito. I requisiti non forniscono
-	dettagli che ne permettono un'immediata formalizzazione e quindi sarà necessario analizzare questa azione nell'analisi del problema, in quanto si devono gestire le problematiche
-	del far muovere il robot e farlo andare nelle determinate aree.
+	Due agenti esterni si occupano di depositare nuovi RP nel <span class="blue">WasteStorage</span> container e di prelevare le ceneri dall'<span class="blue">AshStorage</span> container.
+	I requisiti non forniscono dettagli che ne permettono un'immediata formalizzazione.
 	</br>
 	</br>
-	Il <span class="blue">ServiceAccessGUI</span> è il componente del sistema che permette a un utente esterno (<span class="blue">Fridge truck driver</span>) di interagire con il sistema.
-	Ha quindi la necessità di inviare e ricevere messaggi ed è opportuno (almeno per questa prima fase di analisi) modellare anche questa entità come un <b>actor</b>, per permettere la simulazione delle azioni svolte dal driver e per effettuare dei primi test sul sistema. In particolare, la <span class="blue">ServiceAccessGUI</span>
-	invia richieste al <span class="blue">ColdStorageService</span> che possono essere formalizzate come <code class="language-java">Request storerequest : storerequest(FW)</code>,
-	dove <span class="red"><b>FW</b></span> è il peso in kilogrammi del <b>food load</b> che si vuole depositare. Si nota che a questa richiesta possono corrispondere due tipi
-	di risposte (modellabili come <b>reply</b>) da parte del servizio: richiesta accettata con ritorno di un <b>ticket</b> <code class="language-java">Reply loadaccepted : loadaccepted(TICKET)</code>; oppure
-	richiesta rifiutata <code class="language-java">Reply loadrejected : loadrejected(_)</code>. Il sistema terrà conto in una variabile dell'orario di emissione del ticket, che scadrà
-	dopo un tempo di <span class="red"><b>TICKETTIME</b></span> secondi che è uguale per ogni ticket ed è un'informazione data preventivamente all'utente.</br>
-	La GUI avrà un campo di input che permette al driver di inviare la richiesta e uno per inviare il ticket quando il driver è nella <span class="red">INDOOR</span> (oltre a un campo
-	per visualizzare la variabile <b>storedKG</b> di sistema).
+	La <span class="blue">ServiceStatusGUI</span> è un componente del sistema che permette di visualizzare informazioni.
+	E' quindi opportuno modellarlo (almeno inizialmente), come un <b>attore</b>. <span class="red">DA CONTROLLARE E MAGARI COMPLETARE</span>
 	</br>
 	</br>
-	Il requisito della <span class="blue">ServiceStatusGUI</span> va trattato in maniera simile alla <span class="blue">ServiceAccessGUI</span>, in quanto deve poter ricevere messaggi
-	dal sistema e permettere a un utente esterno (il <span class="blue">Service-Manager</span>) di visualizzare informazioni. E' quindi opportuno modellarlo (almeno inizialmente), come un <b>attore</b>.
-	</br>
-	</br>
-	Per quel che riguarda gli <b>Alarm Requirements</b>, il <b>Sonar</b> e il <b>Led</b> sono dispositivi fisici per i quali il committente fornisce software di supporto nell'utilizzo
-	(<a href="..\html\RaspBasicCode.html#usiamo-un-sonar-hc-sr04">RaspBasicCode</a>, <a href="..\html\RaspApplCode.html">RaspApplCode</a> ). Il sonar deve essere utilizzato come <b>alarm device</b>
-	e il led come <b>warning device</b>. Come per il <span class="blue">Transport trolley</span> con il DDR robot, è possibile definire questi due componenti come un <b>attore</b> posto in
-	un contesto esterno al sistema, che utilizza i dispositivi fisici associati. La distanza <span class="blue">DLIMIT</span> sarà quindi una costante dell'attore. </br>
-	Non essendoci chiarezza su chi deve <b>stoppare</b> o far ripartire il trolley non è possibile, almeno in questa fase, formalizzare queste azioni.
+	
 </div>	
 
 <h3>Analisi delle User Stories</h3>
@@ -1004,10 +1006,10 @@ lo stato del sistema. <b>(Tempo previsto per la realizzazione: 1 giornata lavora
 </div>  
 
 <div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;color:white">
-By Matteo Giri email: matteo.giri@studio.unibo.it
+By Corso Luca, de Respinis Valentina e Sindaco Daniele </br>email: luca.corso@studio.unibo.it || valentina.derespinis@studio.unibo.it || daniele.sindaco@studio.unibo.it
 <br>
-Link GitHub Repo: https://github.com/s1090263/iss2023/
-<img src="./immagini/fotoGiriMatteo.jpg" alt="foto" width="20%" height="20%">
+Link GitHub Repo: https://github.com/ilcors-dev/ISS_PROJECT/tree/main
+<!--<img src="./immagini/foto.jpg" alt="foto" width="20%" height="20%"> -->
 </div> 
 </body>
 </html>

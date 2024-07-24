@@ -118,8 +118,13 @@ WIS: Si inizializzano variabili e poi si controlla lo stato (checkStatus). Da qu
 xx Variabile INHOME messa al fine di sapere se l'oprobot è in home per evitare di mandargli messaggi inutili in checkStatus, verrà poi sostituita dal sistema di posizionamento dell'oprobot da implementare successivamente. Per adesso oprobot dice quando è nlla home e lo comunica al wis che si occuperà di aggiornare lo status.
 xx Argomenti (X,Y) momentaneamente usati, ma andranno sostituiti dal sistema di posizionamento
 
-Inizio scrittura piano di test:
-1-
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+Scrittura documento Sprint0:
+- Scritta prima parte dell'analisi dei requisiti (da controllare)
+- Scrivere Analisi delle User Stories, Modello del sistema, Piani di testing, Piano di lavoro
+- generare schemini qak
+
+
 
 NEXT STEPS:
 Leggendo la UserStory dobbiamo ipotizzare un TestPlan.
