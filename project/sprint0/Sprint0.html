@@ -262,7 +262,7 @@ font-size:65%;
     
 <head>
    
-<title>Sprint0 Corso, de Respinis, Sindaco </title>
+<title>Sprint0 Corsetti, de Respinis, Sindaco </title>
 
 </head>
     
@@ -312,16 +312,14 @@ class ServiceArea {
 	</br>
 	</br>
     Al fine di formalizzare tutti gli elementi presenti nella <b>service area</b>, è utile creare una rappresentazione a griglia dell'area. 
-	Per farlo si utilizza come riferimento il <b>DDR robot</b> e si va quindi a dividere la <b>service area</b> in celle di dimensioni <span class="red"><b>NON SI SA, DA DISCUTERE!!!</b></span>, 
-    ovvero della dimensione del robot. E' necessario quindi, definire il concetto di <b>step</b>, ovvero un movimento elementare che sposta il robot della sua 
-	dimensione (utile per la creazione della rappresentazione in celle e per muovere il robot tra le celle).
+	Per farlo si utilizza come riferimento il <b>DDR robot</b> e si va quindi a dividere la <b>service area</b> in celle di dimensioni grandi quanto quella del robot.
 	<blockquote>
 		<a class="reference internal image-reference" href="./immagini/GrigliaRappr.png"><img alt="./immagini/GrigliaRappr.png" class="align-center" src="./immagini/GrigliaRappr.png" style="width: 20%;" /></a>
 	</blockquote>
 	All'esterno della <b>service area</b> sono presenti due container, il <span class="blue">WasteStorage</span> e l'<span class="blue">AshStorage</span>, e un <span class="blue">MonitoringDevice</span>.
 	</br>
 	Il <span class="blue">WasteStorage</span> container possiede una bilancia come <b>weighing device</b>, che riporta il peso dei vari Roll Packets (RP) depositati al suo interno. Il container è considerato vuoto 
-	quando il valore della bilancia è approssimativamente zero. Ogni RP ha un peso di circa 50kg, modellato come cosatnte dell'attore. Il container possiede una porta di ingresso <span class="red">WASTEIN</span> all'interno 
+	quando il valore della bilancia è approssimativamente zero. Ogni RP ha un peso di circa 50kg, modellato come costante dell'attore. Il container possiede una porta di ingresso <span class="red">WASTEIN</span> all'interno 
 	della <b>service area</b>,	rappresentata come una cella della griglia adiacente ad esso.
 	</br>
 	</br>
@@ -339,13 +337,13 @@ class ServiceArea {
 	<span class="red">Da controllare tutta sta frase</span> </br>
 	Il <b>Sonar</b> e il <b>Led</b> sono dispositivi fisici per i quali il committente fornisce software di supporto nell'utilizzo (<a href="..\html\RaspBasicCode.html">RaspBasicCode</a>, 
 	<a href="..\html\RaspApplCode24.html">RaspApplCode24</a> ). Come per l'<span class="blue">OpRobot</span> con il DDR robot, è possibile definire questi due 
-	componenti come un <b>attore</b> posto in un contesto esterno al sistema, che utilizza i dispositivi fisici associati. La distanza <span class="red">DLIMIT</span> sarà quindi una costante dell'attore.
-	<span class="red">in verità nel codice non l'abbiamo messa come costante, dovremmo segnarla come costante (var DLIMIT etc)?</span> </br>
+	componenti come un <b>attore</b> posto in un contesto esterno al sistema, che utilizza i dispositivi fisici associati. La distanza <span class="red">DLIMIT</span> 
+	sarà quindi una variabile dell'attore.
 	</br>
 	</br>
 	All'interno della <b>service area</b> è presente un <span class="blue">Inceneritore</span>, che può bruciare un RP alla volta in <span class="red"><b>BTIME</b></span> 
-	secondi, che sarà una costante dell'attore<span class="red">in verità nel codice noi abbiamo passato direttamente BTIME, dovremmo segnarla come costante (var BTIME etc)?</span>. Sono presenti due porte, rappresentate come celle della griglia, <span class="red">BURNIN</span> e <span class="red">BURNOUT</span>, che permettono 
-	rispettivamente l'ingresso del RP e l'uscita delle ceneri dall'<span class="blue">Inceneritore</span>.
+	secondi, che sarà una variabile dell'attore. Sono presenti due porte, rappresentate come celle della griglia, <span class="red">BURNIN</span> e 
+	<span class="red">BURNOUT</span>, che permettono rispettivamente l'ingresso del RP e l'uscita delle ceneri dall'<span class="blue">Inceneritore</span>.
 	</br>
 	</br>
 	Un <b>DDR robot</b> è un robot che possiede due ruote motrici sullo stesso asse e una terza ruota condotta (non motrice). Il committente fornisce un servizio 
@@ -1006,7 +1004,7 @@ lo stato del sistema. <b>(Tempo previsto per la realizzazione: 1 giornata lavora
 </div>  
 
 <div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;color:white">
-By Corso Luca, de Respinis Valentina e Sindaco Daniele </br>email: luca.corso@studio.unibo.it || valentina.derespinis@studio.unibo.it || daniele.sindaco@studio.unibo.it
+By Corsetti Luca, de Respinis Valentina e Sindaco Daniele </br>email: luca.corsetti@studio.unibo.it || valentina.derespinis@studio.unibo.it || daniele.sindaco@studio.unibo.it
 <br>
 Link GitHub Repo: https://github.com/ilcors-dev/ISS_PROJECT/tree/main
 <!--<img src="./immagini/foto.jpg" alt="foto" width="20%" height="20%"> -->
